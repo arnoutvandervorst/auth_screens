@@ -7,7 +7,9 @@ The screens around signing in for Flutter apps, kept in one place so every app p
 - **The app's look** (`AuthScreens.configure`): a `layout` that draws a `StatusView` (busy, showMessage, slow, title, body, extra, buttons) and a `button` that draws a `StatusAction` (label, emphasis primary / secondary / quiet, icon, busy). One app shows its splash colour and a moving mark, another a header and a medallion; the structure stays the same.
 - **The app's words** (`AuthScreensStrings`): set `strings` to a function that reads your translations. Defaults are English.
 
-No Firebase and no native code: only Flutter and `flutter_hooks`, so a boot shell can use it before Firebase starts.
+- **The forms** (`package:auth_screens/auth_forms.dart`): `EmailAuthBody` (sign in or up), `ResetPasswordBody` and `PhoneSignInBody`, on auth_engine's `CredentialsStateCore` and `PhoneLoginState`. The structure is fixed (fields, inline error, main button, providers, forgot password, slots for a header, an intro and a footer); `AuthForms.configure` gives the page, the fields per `AuthFieldKind`, the provider buttons, the error box, body text, the error wording and the words.
+
+The status screens (`auth_screens.dart`) import neither Firebase nor the auth engine, so a boot shell can use them before Firebase starts; the forms live in their own library.
 
 ## Use
 
@@ -16,7 +18,7 @@ dependencies:
   auth_screens:
     git:
       url: https://github.com/arnoutvandervorst/auth_screens.git
-      ref: v0.1.0
+      ref: v0.2.0
 ```
 
 ```dart
