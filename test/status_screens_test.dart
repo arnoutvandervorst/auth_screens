@@ -72,4 +72,10 @@ void main() {
     await tester.pump();
     expect(views.last.extra, isA<Text>());
   });
+
+  testWidgets('a state hands its visual to the layout', (tester) async {
+    const picture = Text('picture');
+    await pump(tester, OutdatedStatus(visual: picture, storeUrl: null, onOpen: (_) {}));
+    expect(views.last.visual, same(picture));
+  });
 }

@@ -38,6 +38,10 @@ class StatusView {
   final String? title;
   final String? body;
 
+  /// The picture of this state above the title (an icon in a medallion, a
+  /// photo), in the app's look; null when the layout has one mark of its own.
+  final Widget? visual;
+
   /// A block under the body (a reason, a result line).
   final Widget? extra;
 
@@ -50,6 +54,7 @@ class StatusView {
     required this.slow,
     this.title,
     this.body,
+    this.visual,
     this.extra,
     this.buttons = const [],
   });
@@ -127,6 +132,7 @@ Widget _defaultLayout(BuildContext context, StatusView view) => Center(
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
+      ?view.visual,
       if (view.showMessage && view.title != null) Text(view.title!),
       if (view.showMessage && view.body != null) Text(view.body!),
       ?view.extra,

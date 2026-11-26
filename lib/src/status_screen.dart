@@ -10,13 +10,15 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 ///
 /// [busy]: the line shows after [kMessageAfter] (most starts are done by
 /// then), and after [kSlowAfter] "this takes longer than usual" with Try
-/// again ([onRetry]). Still: everything at once. [buttons] are drawn by the
+/// again ([onRetry]). Still: everything at once. [visual] is the app's
+/// picture of this state, handed to the layout as it is. [buttons] are drawn by the
 /// app already (a case the data in [actions] does not cover); they follow
 /// [actions].
 class StatusScreen extends HookWidget {
   final bool busy;
   final String? title;
   final String? body;
+  final Widget? visual;
   final Widget? extra;
   final List<StatusAction> actions;
   final List<Widget> buttons;
@@ -27,6 +29,7 @@ class StatusScreen extends HookWidget {
     this.busy = false,
     this.title,
     this.body,
+    this.visual,
     this.extra,
     this.actions = const [],
     this.buttons = const [],
@@ -71,6 +74,7 @@ class StatusScreen extends HookWidget {
         slow: slow,
         title: slow ? l.slowTitle : title,
         body: slow ? l.slowBody : body,
+        visual: visual,
         extra: slow || busy ? null : extra,
         buttons: drawn,
       ),

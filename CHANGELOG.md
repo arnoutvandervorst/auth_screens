@@ -2,6 +2,10 @@
 
 All notable changes to this package. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses [semantic versioning](https://semver.org/) (pre-1.0: a minor bump may break the API). Each version is a git tag (`vX.Y.Z`) with a GitHub release.
 
+## [0.3.0] - 2026-11-26
+### Added
+- `visual` on `StatusScreen`, on every state widget and on `StatusView`: the app's picture of that state (an icon in a medallion, a photo), handed to the layout as it is. For a look where each state has its own picture; a layout with one mark of its own ignores it.
+
 ## [0.2.0] - 2026-11-26
 ### Added
 - The auth forms as a separate library, `package:auth_screens/auth_forms.dart`, on auth_engine's states: `EmailAuthBody` (sign in or up: e-mail, password with the keyboard moving on and submitting, the inline error, the main button, Google and Apple, "Forgot password?", header, intro and footer slots), `ResetPasswordBody` and `PhoneSignInBody` (number, code, another number, on `PhoneLoginState`). Every trigger runs through `CredentialsStateCore.run`, so only one is in flight and an error stays on the page.
@@ -16,5 +20,6 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 - `AuthScreensStrings` and `AuthScreens.configure`: the app's words and look.
 - The states: `BootingStatus`, `SigningInStatus`, `AuthFailedStatus`, `ExpiredStatus`, `MaintenanceStatus`, `OutdatedStatus`, `EmailNotVerifiedStatus`.
 
+[0.3.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.3.0
 [0.2.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.2.0
 [0.1.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.1.0
