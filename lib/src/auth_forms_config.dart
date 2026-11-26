@@ -67,6 +67,11 @@ class AuthFormsStrings {
   final String verifyCode;
   final String changePhoneNumber;
 
+  /// What the form says when the keyboard submits it too early.
+  final String emailInvalid;
+  final String passwordMissing;
+  final String passwordWeak;
+
   const AuthFormsStrings({
     this.email = 'E-mail',
     this.password = 'Password',
@@ -84,6 +89,9 @@ class AuthFormsStrings {
     this.codeHelper = _codeHelper,
     this.verifyCode = 'Sign in',
     this.changePhoneNumber = 'Use another number',
+    this.emailInvalid = 'Enter a valid e-mail address.',
+    this.passwordMissing = 'Enter your password.',
+    this.passwordWeak = 'Choose a stronger password.',
   });
 }
 
@@ -116,6 +124,16 @@ abstract final class AuthForms {
   /// Whether a sign-in or sign-up that worked offers to save the password
   /// (the platform's sheet). Off in an automated run, where nobody answers it.
   static bool savePassword = true;
+
+  /// A form's page ([page]) that puts the keyboard away when the person
+  /// drags it: what lies under the keyboard is then in reach.
+  static Widget pageOf(BuildContext context, List<Widget> children) => NotificationListener<ScrollStartNotification>(
+    onNotification: (notification) {
+      if (notification.dragDetails != null) FocusManager.instance.primaryFocus?.unfocus();
+      return false;
+    },
+    child: page(context, children),
+  );
 
   static void configure({
     required AuthPageBuilder page,

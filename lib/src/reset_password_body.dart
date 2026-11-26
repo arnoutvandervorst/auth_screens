@@ -1,6 +1,7 @@
 import 'package:auth_engine/auth_engine.dart';
 import 'package:auth_screens/src/auth_forms_config.dart';
 import 'package:auth_screens/src/auth_screens_config.dart';
+import 'package:auth_screens/src/main_action_in_view.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -34,6 +35,7 @@ class ResetPasswordBody extends HookWidget {
     final busy = useState(false);
 
     Future<void> send() async {
+      FocusManager.instance.primaryFocus?.unfocus();
       busy.value = true;
       try {
         await flows.sendPasswordResetEmail(email: credentials.username.value);
@@ -49,7 +51,7 @@ class ResetPasswordBody extends HookWidget {
 
     return SignalBuilder(builder: (context) {
       final ready = credentials.isUserNameValid.value;
-      return AuthForms.page(context, [
+      return AuthForms.pageOf(context, [
         ?header,
         AuthForms.text(context, l.resetIntro),
         AuthForms.field(
@@ -62,9 +64,12 @@ class ResetPasswordBody extends HookWidget {
             onSubmitted: (_) => ready && !busy.value ? send() : null,
           ),
         ),
-        AuthScreens.button(
-          context,
-          StatusAction(key: sendKey, label: l.reset, icon: AuthForms.icons.reset, busy: busy.value, onPressed: ready && !busy.value ? send : null),
+        MainActionInView(
+          watch: [credentials.username],
+          child: AuthScreens.button(
+            context,
+            StatusAction(key: sendKey, label: l.reset, icon: AuthForms.icons.reset, busy: busy.value, onPressed: ready && !busy.value ? send : null),
+          ),
         ),
         AuthScreens.button(context, StatusAction(label: l.backToSignIn, emphasis: StatusEmphasis.quiet, onPressed: onBack)),
       ]);

@@ -2,7 +2,9 @@ import 'package:auth_engine/auth_engine.dart';
 import 'package:auth_screens/src/auth_forms_config.dart';
 import 'package:auth_screens/src/auth_screens_config.dart';
 import 'package:flutter/services.dart';
+import 'package:auth_screens/src/main_action_in_view.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 /// Signing in or ([signUp]) up with an e-mail address, in one structure:
@@ -10,10 +12,12 @@ import 'package:signals_flutter/signals_flutter.dart';
 /// and the main button, the provider buttons, "Forgot password?" (sign-in,
 /// with [onForgotPassword]) and [footer] (terms, for example).
 ///
-/// The keyboard moves from e-mail to password and submits from there; every
+/// The keyboard moves from e-mail to password and submits from there, or
+/// says what is still missing; every
 /// trigger (button, keyboard, providers) runs through [CredentialsStateCore.run],
-/// so only one is in flight and an error stays on the page.
-class EmailAuthBody extends StatelessWidget {
+/// so only one is in flight and an error stays on the page. The main button
+/// stays above the keyboard ([MainActionInView]).
+class EmailAuthBody extends HookWidget {
   final bool signUp;
   final CredentialsStateCore credentials;
   final AuthFlowsCore<Object?> flows;
@@ -37,9 +41,17 @@ class EmailAuthBody extends StatelessWidget {
 
   static const submitKey = ValueKey('auth-submit');
 
+  /// Why the form cannot be sent yet, or null when it can.
+  String? _missing(AuthFormsStrings l) {
+    if (!credentials.isUserNameValid.value) return l.emailInvalid;
+    if (signUp) return credentials.isValid.value ? null : l.passwordWeak;
+    return credentials.canSignIn.value ? null : l.passwordMissing;
+  }
+
   Future<void> _submit() async {
-    final ready = signUp ? credentials.isValid.value : credentials.canSignIn.value;
-    if (!ready) return;
+    if (_missing(AuthForms.strings()) != null) return;
+    //* The keyboard goes: the busy button and an error line are then in view.
+    FocusManager.instance.primaryFocus?.unfocus();
     final email = credentials.username.value;
     final password = credentials.password.value;
     final ok = await credentials.run(
@@ -53,11 +65,13 @@ class EmailAuthBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AuthForms.strings();
+    //* What the keyboard's Go found missing; gone at the next keystroke.
+    final missing = useState<String?>(null);
     return SignalBuilder(builder: (context) {
       final busy = credentials.busy.value;
       final error = credentials.authError.value;
       final ready = signUp ? credentials.isValid.value : credentials.canSignIn.value;
-      return AuthForms.page(context, [
+      return AuthForms.pageOf(context, [
         ?header,
         ?intro,
         AutofillGroup(
@@ -71,7 +85,10 @@ class EmailAuthBody extends StatelessWidget {
                   key: const ValueKey('auth-email'),
                   kind: AuthFieldKind.email,
                   hint: l.email,
-                  onChanged: credentials.setUserName,
+                  onChanged: (value) {
+                    missing.value = null;
+                    credentials.setUserName(value);
+                  },
                   action: TextInputAction.next,
                 ),
               ),
@@ -81,20 +98,32 @@ class EmailAuthBody extends StatelessWidget {
                   key: const ValueKey('auth-password'),
                   kind: signUp ? AuthFieldKind.newPassword : AuthFieldKind.password,
                   hint: l.password,
-                  onChanged: credentials.setPassword,
+                  onChanged: (value) {
+                    missing.value = null;
+                    credentials.setPassword(value);
+                  },
                   action: TextInputAction.go,
-                  onSubmitted: (_) => _submit(),
+                  onSubmitted: (_) {
+                    missing.value = _missing(l);
+                    if (missing.value == null) _submit();
+                  },
                 ),
               ),
-              if (error != null) AuthForms.error(context, AuthForms.describe(error)),
-              AuthScreens.button(
-                context,
-                StatusAction(
-                  key: submitKey,
-                  label: signUp ? l.signUp : l.signIn,
-                  icon: signUp ? AuthForms.icons.signUp : AuthForms.icons.signIn,
-                  busy: busy,
-                  onPressed: ready && !busy ? _submit : null,
+              if (error != null)
+                AuthForms.error(context, AuthForms.describe(error))
+              else if (missing.value != null)
+                AuthForms.error(context, missing.value!),
+              MainActionInView(
+                watch: [credentials.username, credentials.password, credentials.authError],
+                child: AuthScreens.button(
+                  context,
+                  StatusAction(
+                    key: submitKey,
+                    label: signUp ? l.signUp : l.signIn,
+                    icon: signUp ? AuthForms.icons.signUp : AuthForms.icons.signIn,
+                    busy: busy,
+                    onPressed: ready && !busy ? _submit : null,
+                  ),
                 ),
               ),
             ],

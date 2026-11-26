@@ -2,6 +2,15 @@
 
 All notable changes to this package. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses [semantic versioning](https://semver.org/) (pre-1.0: a minor bump may break the API). Each version is a git tag (`vX.Y.Z`) with a GitHub release.
 
+## [0.5.0] - 2026-11-26
+### Added
+- The forms never leave the person stuck behind the keyboard. `MainActionInView` keeps a form's main button above the keyboard: the page scrolls just far enough when the keyboard comes up, when the form grows (a strength meter, an error line) and while typing.
+- The keyboard's Go on a form that cannot be sent yet says what is missing in the error line (`AuthFormsStrings.emailInvalid`, `passwordMissing`, `passwordWeak`) instead of doing nothing; the next keystroke takes the line away.
+- `AuthForms.pageOf`: the forms' page puts the keyboard away when the person drags it, so what lies under the keyboard is in reach.
+### Changed
+- Sending a form (its button or the keyboard) puts the keyboard away, so the busy button and an error line are in view.
+- `EmailAuthBody` is a `HookWidget`.
+
 ## [0.4.0] - 2026-11-26
 ### Added
 - `AuthFormsIcons` (`AuthForms.configure(icons:)`): an icon on the forms' main buttons (sign in, sign up, send the reset link, send the code, verify the code), in the app's icon set. None by default.
@@ -28,6 +37,7 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 - `AuthScreensStrings` and `AuthScreens.configure`: the app's words and look.
 - The states: `BootingStatus`, `SigningInStatus`, `AuthFailedStatus`, `ExpiredStatus`, `MaintenanceStatus`, `OutdatedStatus`, `EmailNotVerifiedStatus`.
 
+[0.5.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.5.0
 [0.4.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.4.0
 [0.3.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.3.0
 [0.2.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.2.0

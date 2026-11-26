@@ -149,4 +149,44 @@ void main() {
     expect(actions.first.icon, mark);
     expect(AuthForms.savePassword, isFalse);
   });
+
+  testWidgets('the keyboard sent too early: the form says what is missing, a keystroke takes it away', (tester) async {
+    final flows = _Flows();
+    final state = credentials();
+    addTearDown(state.dispose);
+    await pump(tester, EmailAuthBody(signUp: false, credentials: state, flows: flows));
+    fields.last.onSubmitted!('');
+    await tester.pump();
+    expect(find.text('error Enter a valid e-mail address.'), findsOneWidget);
+    expect(flows.calls, isEmpty);
+
+    fields.first.onChanged('a@b.c');
+    await tester.pump();
+    expect(find.textContaining('error'), findsNothing);
+    fields.last.onSubmitted!('');
+    await tester.pump();
+    expect(find.text('error Enter your password.'), findsOneWidget);
+  });
+
+  testWidgets('with the keyboard up the main button is scrolled into view', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(300, 300));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    addTearDown(tester.view.reset);
+    AuthForms.configure(
+      page: (context, children) => ListView(children: children),
+      field: (context, field) => SizedBox(height: 200, child: Text('field ${field.kind.name}')),
+      providerButton: AuthForms.providerButton,
+      error: AuthForms.error,
+      text: AuthForms.text,
+      describe: AuthForms.describe,
+    );
+    final state = credentials();
+    addTearDown(state.dispose);
+    await pump(tester, EmailAuthBody(signUp: false, credentials: state, flows: _Flows(), providers: const []));
+    expect(find.byKey(EmailAuthBody.submitKey).hitTestable(), findsNothing, reason: 'below the fold');
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 100);
+    await tester.pumpAndSettle();
+    expect(find.byKey(EmailAuthBody.submitKey).hitTestable(), findsOneWidget);
+  });
 }

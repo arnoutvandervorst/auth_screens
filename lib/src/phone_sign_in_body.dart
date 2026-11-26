@@ -1,6 +1,7 @@
 import 'package:auth_engine/auth_engine.dart';
 import 'package:auth_screens/src/auth_forms_config.dart';
 import 'package:auth_screens/src/auth_screens_config.dart';
+import 'package:auth_screens/src/main_action_in_view.dart';
 import 'package:flutter/widgets.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -19,10 +20,16 @@ class PhoneSignInBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AuthForms.strings();
+    //* The keyboard goes with the tap: the busy button and an error line are then in view.
+    void closing(void Function() action) {
+      FocusManager.instance.primaryFocus?.unfocus();
+      action();
+    }
+
     return SignalBuilder(builder: (context) {
       final busy = state.isLoading.value;
       final error = state.errorAuthError.value;
-      return AuthForms.page(context, [
+      return AuthForms.pageOf(context, [
         ?header,
         AuthForms.text(context, l.phoneIntro),
         if (!state.codeSent.value) ...[
@@ -40,7 +47,10 @@ class PhoneSignInBody extends StatelessWidget {
               enabled: !busy,
             ),
           ),
-          AuthScreens.button(context, StatusAction(key: sendKey, label: l.sendCode, icon: AuthForms.icons.sendCode, busy: busy, onPressed: busy ? null : state.sendOtp)),
+          MainActionInView(
+            watch: [state.phoneNumber, state.errorAuthError],
+            child: AuthScreens.button(context, StatusAction(key: sendKey, label: l.sendCode, icon: AuthForms.icons.sendCode, busy: busy, onPressed: busy ? null : () => closing(state.sendOtp))),
+          ),
         ] else ...[
           AuthForms.field(
             context,
@@ -55,7 +65,10 @@ class PhoneSignInBody extends StatelessWidget {
               enabled: !busy,
             ),
           ),
-          AuthScreens.button(context, StatusAction(key: verifyKey, label: l.verifyCode, icon: AuthForms.icons.verifyCode, busy: busy, onPressed: busy ? null : state.submitOtp)),
+          MainActionInView(
+            watch: [state.smsCode, state.errorAuthError],
+            child: AuthScreens.button(context, StatusAction(key: verifyKey, label: l.verifyCode, icon: AuthForms.icons.verifyCode, busy: busy, onPressed: busy ? null : () => closing(state.submitOtp))),
+          ),
           AuthScreens.button(
             context,
             StatusAction(label: l.changePhoneNumber, emphasis: StatusEmphasis.quiet, onPressed: busy ? null : state.changePhoneNumber),
