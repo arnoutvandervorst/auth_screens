@@ -18,7 +18,7 @@ dependencies:
   auth_screens:
     git:
       url: https://github.com/arnoutvandervorst/auth_screens.git
-      ref: v0.5.2
+      ref: v0.6.0
 ```
 
 ```dart

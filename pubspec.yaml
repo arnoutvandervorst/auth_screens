@@ -1,6 +1,6 @@
 name: auth_screens
 description: The screens around signing in for Flutter apps - status screens (booting, signing in, maintenance, an outdated build, a failed or expired session, an unverified e-mail) and the sign-in, sign-up, password-reset and phone forms, with one shared structure and each app's own look.
-version: 0.5.2
+version: 0.6.0
 publish_to: none
 
 environment:

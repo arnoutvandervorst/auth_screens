@@ -2,6 +2,15 @@
 
 All notable changes to this package. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses [semantic versioning](https://semver.org/) (pre-1.0: a minor bump may break the API). Each version is a git tag (`vX.Y.Z`) with a GitHub release.
 
+## [0.6.0] - 2026-11-26
+### Added
+- `PhoneSignInBody` says an empty number or an empty code in its own words (`AuthFormsStrings.phoneMissing`, `codeMissing`) and does not ask the state: it used to show the wording of an invalid credential. The next keystroke takes the line away.
+- `AuthFormsStrings.sendCodeFailed`: one line for a code that could not be sent, in place of the error's own wording. Null (the default) keeps that wording.
+### Changed
+- `PhoneSignInBody` is a `HookWidget`.
+### Fixed
+- The fallback field of an unconfigured `AuthForms` made a controller and a focus node on every build. It is a `Text` now.
+
 ## [0.5.2] - 2026-11-26
 ### Changed
 - Depends on auth_engine 0.3.4: `PhoneLoginState` no longer writes to disposed signals when the phone form closes while a code is being sent or checked. An app on auth_engine 0.3.4 can use this version without a git-ref conflict.
@@ -45,6 +54,7 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 - `AuthScreensStrings` and `AuthScreens.configure`: the app's words and look.
 - The states: `BootingStatus`, `SigningInStatus`, `AuthFailedStatus`, `ExpiredStatus`, `MaintenanceStatus`, `OutdatedStatus`, `EmailNotVerifiedStatus`.
 
+[0.6.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.6.0
 [0.5.2]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.5.2
 [0.5.1]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.5.1
 [0.5.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.5.0

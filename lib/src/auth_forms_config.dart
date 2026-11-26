@@ -71,6 +71,12 @@ class AuthFormsStrings {
   final String emailInvalid;
   final String passwordMissing;
   final String passwordWeak;
+  final String phoneMissing;
+  final String codeMissing;
+
+  /// The line when the code could not be sent, in place of the error's own
+  /// wording; null keeps that wording.
+  final String? sendCodeFailed;
 
   const AuthFormsStrings({
     this.email = 'E-mail',
@@ -92,6 +98,9 @@ class AuthFormsStrings {
     this.emailInvalid = 'Enter a valid e-mail address.',
     this.passwordMissing = 'Enter your password.',
     this.passwordWeak = 'Choose a stronger password.',
+    this.phoneMissing = 'Enter your phone number.',
+    this.codeMissing = 'Enter the code.',
+    this.sendCodeFailed,
   });
 }
 
@@ -158,19 +167,9 @@ abstract final class AuthForms {
   }
 }
 
-//* shortcut: the fallback makes a controller and focus node per build; it only
-//* serves an unconfigured test, every app configures its own field.
-Widget _defaultField(BuildContext context, AuthFieldSpec field) => EditableText(
-  key: field.key,
-  controller: field.controller ?? TextEditingController(),
-  focusNode: FocusNode(),
-  style: const TextStyle(),
-  cursorColor: const Color(0xFF000000),
-  backgroundCursorColor: const Color(0xFF000000),
-  onChanged: field.onChanged,
-  onSubmitted: field.onSubmitted,
-  textInputAction: field.action,
-);
+//* The fallback only names the field: it serves an unconfigured test, every
+//* app configures its own field.
+Widget _defaultField(BuildContext context, AuthFieldSpec field) => Text(field.hint, key: field.key);
 
 Widget _defaultProvider(BuildContext context, AuthProvider provider, bool busy, VoidCallback? onPressed) =>
     GestureDetector(onTap: onPressed, child: Text(provider.name));

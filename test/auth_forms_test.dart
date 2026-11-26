@@ -226,4 +226,18 @@ void main() {
     expect((pages, fields.length), (1, 2));
     expect(labels.last, 'Sign in true');
   });
+
+  testWidgets('phone: an empty number is said in its own words and asks nothing of the state', (tester) async {
+    final state = PhoneLoginState(() => _Flows());
+    addTearDown(state.dispose);
+    await pump(tester, PhoneSignInBody(state: state));
+    await tester.tap(find.byKey(PhoneSignInBody.sendKey));
+    await tester.pump();
+    expect(find.text('error Enter your phone number.'), findsOneWidget);
+    expect(state.errorAuthError.value, isNull);
+
+    fields.last.onChanged('+31612345678');
+    await tester.pump();
+    expect(find.textContaining('error'), findsNothing);
+  });
 }
