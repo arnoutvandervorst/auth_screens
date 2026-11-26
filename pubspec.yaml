@@ -1,6 +1,6 @@
 name: auth_screens
 description: The screens around signing in for Flutter apps - status screens (booting, signing in, maintenance, an outdated build, a failed or expired session, an unverified e-mail) and the sign-in, sign-up, password-reset and phone forms, with one shared structure and each app's own look.
-version: 0.5.1
+version: 0.5.2
 publish_to: none
 
 environment:
@@ -13,7 +13,7 @@ dependencies:
   auth_engine:
     git:
       url: https://github.com/arnoutvandervorst/auth_engine.git
-      ref: v0.3.3
+      ref: v0.3.4
   flutter_hooks: ^0.21.3+1
   signals_flutter: ^7.0.0
 

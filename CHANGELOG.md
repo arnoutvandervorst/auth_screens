@@ -2,6 +2,10 @@
 
 All notable changes to this package. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses [semantic versioning](https://semver.org/) (pre-1.0: a minor bump may break the API). Each version is a git tag (`vX.Y.Z`) with a GitHub release.
 
+## [0.5.2] - 2026-11-26
+### Changed
+- Depends on auth_engine 0.3.4: `PhoneLoginState` no longer writes to disposed signals when the phone form closes while a code is being sent or checked. An app on auth_engine 0.3.4 can use this version without a git-ref conflict.
+
 ## [0.5.1] - 2026-11-26
 ### Fixed
 - A keystroke rebuilt the whole form page. The page and its fields are now built once; only the parts that show state rebuild: the error line with the main button, the provider buttons, and on the phone form the field and buttons that wait on the code. The phone form's page follows the step (number or code) and nothing else.
@@ -41,6 +45,7 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 - `AuthScreensStrings` and `AuthScreens.configure`: the app's words and look.
 - The states: `BootingStatus`, `SigningInStatus`, `AuthFailedStatus`, `ExpiredStatus`, `MaintenanceStatus`, `OutdatedStatus`, `EmailNotVerifiedStatus`.
 
+[0.5.2]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.5.2
 [0.5.1]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.5.1
 [0.5.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.5.0
 [0.4.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.4.0
