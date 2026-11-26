@@ -66,71 +66,82 @@ class EmailAuthBody extends HookWidget {
   Widget build(BuildContext context) {
     final l = AuthForms.strings();
     //* What the keyboard's Go found missing; gone at the next keystroke.
-    final missing = useState<String?>(null);
-    return SignalBuilder(builder: (context) {
-      final busy = credentials.busy.value;
-      final error = credentials.authError.value;
-      final ready = signUp ? credentials.isValid.value : credentials.canSignIn.value;
-      return AuthForms.pageOf(context, [
-        ?header,
-        ?intro,
-        AutofillGroup(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: 16,
-            children: [
-              AuthForms.field(
-                context,
-                AuthFieldSpec(
-                  key: const ValueKey('auth-email'),
-                  kind: AuthFieldKind.email,
-                  hint: l.email,
-                  onChanged: (value) {
-                    missing.value = null;
-                    credentials.setUserName(value);
-                  },
-                  action: TextInputAction.next,
-                ),
+    final missing = useMemoized(() => signal<String?>(null));
+    useEffect(() => missing.dispose, [missing]);
+
+    //* The page is built once: only the error line with the main button and
+    //* the provider buttons follow the state, each in its own builder.
+    return AuthForms.pageOf(context, [
+      ?header,
+      ?intro,
+      AutofillGroup(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 16,
+          children: [
+            AuthForms.field(
+              context,
+              AuthFieldSpec(
+                key: const ValueKey('auth-email'),
+                kind: AuthFieldKind.email,
+                hint: l.email,
+                onChanged: (value) {
+                  missing.value = null;
+                  credentials.setUserName(value);
+                },
+                action: TextInputAction.next,
               ),
-              AuthForms.field(
-                context,
-                AuthFieldSpec(
-                  key: const ValueKey('auth-password'),
-                  kind: signUp ? AuthFieldKind.newPassword : AuthFieldKind.password,
-                  hint: l.password,
-                  onChanged: (value) {
-                    missing.value = null;
-                    credentials.setPassword(value);
-                  },
-                  action: TextInputAction.go,
-                  onSubmitted: (_) {
-                    missing.value = _missing(l);
-                    if (missing.value == null) _submit();
-                  },
-                ),
+            ),
+            AuthForms.field(
+              context,
+              AuthFieldSpec(
+                key: const ValueKey('auth-password'),
+                kind: signUp ? AuthFieldKind.newPassword : AuthFieldKind.password,
+                hint: l.password,
+                onChanged: (value) {
+                  missing.value = null;
+                  credentials.setPassword(value);
+                },
+                action: TextInputAction.go,
+                onSubmitted: (_) {
+                  missing.value = _missing(l);
+                  if (missing.value == null) _submit();
+                },
               ),
-              if (error != null)
-                AuthForms.error(context, AuthForms.describe(error))
-              else if (missing.value != null)
-                AuthForms.error(context, missing.value!),
-              MainActionInView(
-                watch: [credentials.username, credentials.password, credentials.authError],
-                child: AuthScreens.button(
-                  context,
-                  StatusAction(
-                    key: submitKey,
-                    label: signUp ? l.signUp : l.signIn,
-                    icon: signUp ? AuthForms.icons.signUp : AuthForms.icons.signIn,
-                    busy: busy,
-                    onPressed: ready && !busy ? _submit : null,
+            ),
+            SignalBuilder(builder: (context) {
+              final busy = credentials.busy.value;
+              final error = credentials.authError.value;
+              final line = error != null ? AuthForms.describe(error) : missing.value;
+              final ready = signUp ? credentials.isValid.value : credentials.canSignIn.value;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 16,
+                children: [
+                  if (line != null) AuthForms.error(context, line),
+                  MainActionInView(
+                    watch: [credentials.username, credentials.password],
+                    child: AuthScreens.button(
+                      context,
+                      StatusAction(
+                        key: submitKey,
+                        label: signUp ? l.signUp : l.signIn,
+                        icon: signUp ? AuthForms.icons.signUp : AuthForms.icons.signIn,
+                        busy: busy,
+                        onPressed: ready && !busy ? _submit : null,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
+                ],
+              );
+            }),
+          ],
         ),
-        if (providers.isNotEmpty)
-          Row(
+      ),
+      if (providers.isNotEmpty)
+        SignalBuilder(builder: (context) {
+          final busy = credentials.busy.value;
+          return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 24,
             children: [
@@ -147,14 +158,14 @@ class EmailAuthBody extends HookWidget {
                         }),
                 ),
             ],
-          ),
-        if (!signUp && onForgotPassword != null)
-          AuthScreens.button(
-            context,
-            StatusAction(label: l.forgotPassword, emphasis: StatusEmphasis.quiet, onPressed: onForgotPassword),
-          ),
-        ?footer,
-      ]);
-    });
+          );
+        }),
+      if (!signUp && onForgotPassword != null)
+        AuthScreens.button(
+          context,
+          StatusAction(label: l.forgotPassword, emphasis: StatusEmphasis.quiet, onPressed: onForgotPassword),
+        ),
+      ?footer,
+    ]);
   }
 }

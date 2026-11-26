@@ -26,55 +26,83 @@ class PhoneSignInBody extends StatelessWidget {
       action();
     }
 
-    return SignalBuilder(builder: (context) {
-      final busy = state.isLoading.value;
+    Widget error() => SignalBuilder(builder: (context) {
       final error = state.errorAuthError.value;
+      return error == null ? const SizedBox.shrink() : AuthForms.error(context, AuthForms.describe(error));
+    });
+
+    //* The page follows the step only; a field, a button and the error line
+    //* each follow what they show.
+    return SignalBuilder(builder: (context) {
+      final codeSent = state.codeSent.value;
       return AuthForms.pageOf(context, [
         ?header,
         AuthForms.text(context, l.phoneIntro),
-        if (!state.codeSent.value) ...[
-          AuthForms.field(
-            context,
-            AuthFieldSpec(
-              key: const ValueKey('phone_input'),
-              kind: AuthFieldKind.phone,
-              hint: l.phoneLabel,
-              helper: l.phoneHelper,
-              initialValue: state.phoneNumber.value,
-              onChanged: (value) => state.phoneNumber.value = value,
-              onSubmitted: (_) => busy ? null : state.sendOtp(),
-              autofocus: true,
-              enabled: !busy,
-            ),
-          ),
+        if (!codeSent) ...[
+          SignalBuilder(builder: (context) {
+            final busy = state.isLoading.value;
+            return AuthForms.field(
+              context,
+              AuthFieldSpec(
+                key: const ValueKey('phone_input'),
+                kind: AuthFieldKind.phone,
+                hint: l.phoneLabel,
+                helper: l.phoneHelper,
+                initialValue: state.phoneNumber.peek(),
+                onChanged: (value) => state.phoneNumber.value = value,
+                onSubmitted: (_) => busy ? null : state.sendOtp(),
+                autofocus: true,
+                enabled: !busy,
+              ),
+            );
+          }),
           MainActionInView(
             watch: [state.phoneNumber, state.errorAuthError],
-            child: AuthScreens.button(context, StatusAction(key: sendKey, label: l.sendCode, icon: AuthForms.icons.sendCode, busy: busy, onPressed: busy ? null : () => closing(state.sendOtp))),
+            child: SignalBuilder(builder: (context) {
+              final busy = state.isLoading.value;
+              return AuthScreens.button(
+                context,
+                StatusAction(key: sendKey, label: l.sendCode, icon: AuthForms.icons.sendCode, busy: busy, onPressed: busy ? null : () => closing(state.sendOtp)),
+              );
+            }),
           ),
+          error(),
         ] else ...[
-          AuthForms.field(
-            context,
-            AuthFieldSpec(
-              key: const ValueKey('otp_input'),
-              kind: AuthFieldKind.code,
-              hint: l.codeLabel,
-              helper: l.codeHelper(state.phoneNumber.value),
-              onChanged: (value) => state.smsCode.value = value,
-              onSubmitted: (_) => busy ? null : state.submitOtp(),
-              autofocus: true,
-              enabled: !busy,
-            ),
-          ),
+          SignalBuilder(builder: (context) {
+            final busy = state.isLoading.value;
+            return AuthForms.field(
+              context,
+              AuthFieldSpec(
+                key: const ValueKey('otp_input'),
+                kind: AuthFieldKind.code,
+                hint: l.codeLabel,
+                helper: l.codeHelper(state.phoneNumber.peek()),
+                onChanged: (value) => state.smsCode.value = value,
+                onSubmitted: (_) => busy ? null : state.submitOtp(),
+                autofocus: true,
+                enabled: !busy,
+              ),
+            );
+          }),
           MainActionInView(
             watch: [state.smsCode, state.errorAuthError],
-            child: AuthScreens.button(context, StatusAction(key: verifyKey, label: l.verifyCode, icon: AuthForms.icons.verifyCode, busy: busy, onPressed: busy ? null : () => closing(state.submitOtp))),
+            child: SignalBuilder(builder: (context) {
+              final busy = state.isLoading.value;
+              return AuthScreens.button(
+                context,
+                StatusAction(key: verifyKey, label: l.verifyCode, icon: AuthForms.icons.verifyCode, busy: busy, onPressed: busy ? null : () => closing(state.submitOtp)),
+              );
+            }),
           ),
-          AuthScreens.button(
-            context,
-            StatusAction(label: l.changePhoneNumber, emphasis: StatusEmphasis.quiet, onPressed: busy ? null : state.changePhoneNumber),
-          ),
+          SignalBuilder(builder: (context) {
+            final busy = state.isLoading.value;
+            return AuthScreens.button(
+              context,
+              StatusAction(label: l.changePhoneNumber, emphasis: StatusEmphasis.quiet, onPressed: busy ? null : state.changePhoneNumber),
+            );
+          }),
+          error(),
         ],
-        if (error != null) AuthForms.error(context, AuthForms.describe(error)),
       ]);
     });
   }

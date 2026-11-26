@@ -32,9 +32,11 @@ class ResetPasswordBody extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final l = AuthForms.strings();
-    final busy = useState(false);
+    final busy = useMemoized(() => signal(false));
+    useEffect(() => busy.dispose, [busy]);
 
     Future<void> send() async {
+      if (busy.value || !credentials.isUserNameValid.value) return;
       FocusManager.instance.primaryFocus?.unfocus();
       busy.value = true;
       try {
@@ -49,30 +51,31 @@ class ResetPasswordBody extends HookWidget {
       onSent();
     }
 
-    return SignalBuilder(builder: (context) {
-      final ready = credentials.isUserNameValid.value;
-      return AuthForms.pageOf(context, [
-        ?header,
-        AuthForms.text(context, l.resetIntro),
-        AuthForms.field(
-          context,
-          AuthFieldSpec(
-            key: const ValueKey('auth-email'),
-            kind: AuthFieldKind.email,
-            hint: l.email,
-            onChanged: credentials.setUserName,
-            onSubmitted: (_) => ready && !busy.value ? send() : null,
-          ),
+    //* The page is built once: only the send button follows the state.
+    return AuthForms.pageOf(context, [
+      ?header,
+      AuthForms.text(context, l.resetIntro),
+      AuthForms.field(
+        context,
+        AuthFieldSpec(
+          key: const ValueKey('auth-email'),
+          kind: AuthFieldKind.email,
+          hint: l.email,
+          onChanged: credentials.setUserName,
+          onSubmitted: (_) => send(),
         ),
-        MainActionInView(
-          watch: [credentials.username],
-          child: AuthScreens.button(
+      ),
+      MainActionInView(
+        watch: [credentials.username],
+        child: SignalBuilder(builder: (context) {
+          final ready = credentials.isUserNameValid.value && !busy.value;
+          return AuthScreens.button(
             context,
-            StatusAction(key: sendKey, label: l.reset, icon: AuthForms.icons.reset, busy: busy.value, onPressed: ready && !busy.value ? send : null),
-          ),
-        ),
-        AuthScreens.button(context, StatusAction(label: l.backToSignIn, emphasis: StatusEmphasis.quiet, onPressed: onBack)),
-      ]);
-    });
+            StatusAction(key: sendKey, label: l.reset, icon: AuthForms.icons.reset, busy: busy.value, onPressed: ready ? send : null),
+          );
+        }),
+      ),
+      AuthScreens.button(context, StatusAction(label: l.backToSignIn, emphasis: StatusEmphasis.quiet, onPressed: onBack)),
+    ]);
   }
 }

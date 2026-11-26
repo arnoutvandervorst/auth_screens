@@ -189,4 +189,41 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(EmailAuthBody.submitKey).hitTestable(), findsOneWidget);
   });
+
+  testWidgets('typing rebuilds neither the page nor a field: only the button follows', (tester) async {
+    var pages = 0;
+    final labels = <String>[];
+    AuthForms.configure(
+      page: (context, children) {
+        pages++;
+        return Column(children: children);
+      },
+      field: (context, field) {
+        fields.add(field);
+        return Text('field ${field.kind.name}');
+      },
+      providerButton: AuthForms.providerButton,
+      error: AuthForms.error,
+      text: AuthForms.text,
+      describe: AuthForms.describe,
+    );
+    AuthScreens.configure(
+      layout: (context, view) => const SizedBox(),
+      button: (context, action) {
+        labels.add('${action.label} ${action.onPressed != null}');
+        return Text(action.label);
+      },
+    );
+    final state = credentials();
+    addTearDown(state.dispose);
+    await pump(tester, EmailAuthBody(signUp: false, credentials: state, flows: _Flows(), providers: const []));
+    expect((pages, fields.length), (1, 2));
+    expect(labels, ['Sign in false']);
+
+    fields.first.onChanged('a@b.c');
+    fields.last.onChanged('secret');
+    await tester.pump();
+    expect((pages, fields.length), (1, 2));
+    expect(labels.last, 'Sign in true');
+  });
 }
