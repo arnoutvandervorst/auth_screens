@@ -33,13 +33,14 @@ class PhoneSignInBody extends StatelessWidget {
               kind: AuthFieldKind.phone,
               hint: l.phoneLabel,
               helper: l.phoneHelper,
+              initialValue: state.phoneNumber.value,
               onChanged: (value) => state.phoneNumber.value = value,
               onSubmitted: (_) => busy ? null : state.sendOtp(),
               autofocus: true,
               enabled: !busy,
             ),
           ),
-          AuthScreens.button(context, StatusAction(key: sendKey, label: l.sendCode, busy: busy, onPressed: busy ? null : state.sendOtp)),
+          AuthScreens.button(context, StatusAction(key: sendKey, label: l.sendCode, icon: AuthForms.icons.sendCode, busy: busy, onPressed: busy ? null : state.sendOtp)),
         ] else ...[
           AuthForms.field(
             context,
@@ -54,7 +55,7 @@ class PhoneSignInBody extends StatelessWidget {
               enabled: !busy,
             ),
           ),
-          AuthScreens.button(context, StatusAction(key: verifyKey, label: l.verifyCode, busy: busy, onPressed: busy ? null : state.submitOtp)),
+          AuthScreens.button(context, StatusAction(key: verifyKey, label: l.verifyCode, icon: AuthForms.icons.verifyCode, busy: busy, onPressed: busy ? null : state.submitOtp)),
           AuthScreens.button(
             context,
             StatusAction(label: l.changePhoneNumber, emphasis: StatusEmphasis.quiet, onPressed: busy ? null : state.changePhoneNumber),

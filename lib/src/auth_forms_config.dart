@@ -14,6 +14,10 @@ class AuthFieldSpec {
   final AuthFieldKind kind;
   final String hint;
   final String? helper;
+
+  /// What the field holds when it first shows (the number after "Use
+  /// another number"); null for an empty field.
+  final String? initialValue;
   final ValueChanged<String> onChanged;
   final TextInputAction action;
   final ValueChanged<String>? onSubmitted;
@@ -27,6 +31,7 @@ class AuthFieldSpec {
     required this.hint,
     required this.onChanged,
     this.helper,
+    this.initialValue,
     this.action = TextInputAction.done,
     this.onSubmitted,
     this.controller,
@@ -82,6 +87,18 @@ class AuthFormsStrings {
   });
 }
 
+/// The icons on the forms' main buttons, in the app's icon set; null for a
+/// button without one.
+class AuthFormsIcons {
+  final IconData? signIn;
+  final IconData? signUp;
+  final IconData? reset;
+  final IconData? sendCode;
+  final IconData? verifyCode;
+
+  const AuthFormsIcons({this.signIn, this.signUp, this.reset, this.sendCode, this.verifyCode});
+}
+
 String _codeHelper(String phoneNumber) => 'The code we texted to $phoneNumber';
 
 /// The app's look and words for the auth forms. Set once at start-up (and
@@ -94,6 +111,11 @@ abstract final class AuthForms {
   static AuthTextBuilder text = (context, text) => Text(text);
   static String Function(AuthError error) describe = (error) => error.name;
   static AuthFormsStrings Function() strings = () => const AuthFormsStrings();
+  static AuthFormsIcons icons = const AuthFormsIcons();
+
+  /// Whether a sign-in or sign-up that worked offers to save the password
+  /// (the platform's sheet). Off in an automated run, where nobody answers it.
+  static bool savePassword = true;
 
   static void configure({
     required AuthPageBuilder page,
@@ -103,6 +125,8 @@ abstract final class AuthForms {
     required AuthTextBuilder text,
     required String Function(AuthError error) describe,
     AuthFormsStrings Function()? strings,
+    AuthFormsIcons icons = const AuthFormsIcons(),
+    bool savePassword = true,
   }) {
     AuthForms.page = page;
     AuthForms.field = field;
@@ -111,6 +135,8 @@ abstract final class AuthForms {
     AuthForms.text = text;
     AuthForms.describe = describe;
     if (strings != null) AuthForms.strings = strings;
+    AuthForms.icons = icons;
+    AuthForms.savePassword = savePassword;
   }
 }
 

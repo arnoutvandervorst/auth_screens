@@ -2,6 +2,14 @@
 
 All notable changes to this package. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses [semantic versioning](https://semver.org/) (pre-1.0: a minor bump may break the API). Each version is a git tag (`vX.Y.Z`) with a GitHub release.
 
+## [0.4.0] - 2026-11-26
+### Added
+- `AuthFormsIcons` (`AuthForms.configure(icons:)`): an icon on the forms' main buttons (sign in, sign up, send the reset link, send the code, verify the code), in the app's icon set. None by default.
+- `AuthForms.configure(savePassword:)`: whether a sign-in or sign-up that worked offers to save the password. On by default; an automated run turns it off, where nobody answers the platform's sheet.
+- `AuthFieldSpec.initialValue`: what a field holds when it first shows. The phone field gets the number already typed, so "Use another number" shows the number that is still in the state.
+### Changed
+- `AuthForms.configure` sets the icons and `savePassword` on every call: left out, they go back to their defaults.
+
 ## [0.3.0] - 2026-11-26
 ### Added
 - `visual` on `StatusScreen`, on every state widget and on `StatusView`: the app's picture of that state (an icon in a medallion, a photo), handed to the layout as it is. For a look where each state has its own picture; a layout with one mark of its own ignores it.
@@ -20,6 +28,7 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 - `AuthScreensStrings` and `AuthScreens.configure`: the app's words and look.
 - The states: `BootingStatus`, `SigningInStatus`, `AuthFailedStatus`, `ExpiredStatus`, `MaintenanceStatus`, `OutdatedStatus`, `EmailNotVerifiedStatus`.
 
+[0.4.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.4.0
 [0.3.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.3.0
 [0.2.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.2.0
 [0.1.0]: https://github.com/arnoutvandervorst/auth_screens/releases/tag/v0.1.0

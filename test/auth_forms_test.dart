@@ -117,4 +117,36 @@ void main() {
     await tester.tap(find.text('Back to sign in'));
     expect(back, 1);
   });
+
+  testWidgets('the configured icons stand on the main buttons; left out, none', (tester) async {
+    const mark = IconData(0xe000);
+    final actions = <StatusAction>[];
+    AuthScreens.configure(
+      layout: (context, view) => const SizedBox(),
+      button: (context, action) {
+        actions.add(action);
+        return Text(action.label);
+      },
+    );
+    final state = credentials();
+    addTearDown(state.dispose);
+    await pump(tester, EmailAuthBody(signUp: false, credentials: state, flows: _Flows()));
+    expect(actions.first.icon, isNull);
+    expect(AuthForms.savePassword, isTrue);
+
+    AuthForms.configure(
+      page: AuthForms.page,
+      field: AuthForms.field,
+      providerButton: AuthForms.providerButton,
+      error: AuthForms.error,
+      text: AuthForms.text,
+      describe: AuthForms.describe,
+      icons: const AuthFormsIcons(signUp: mark),
+      savePassword: false,
+    );
+    actions.clear();
+    await pump(tester, EmailAuthBody(signUp: true, credentials: state, flows: _Flows()));
+    expect(actions.first.icon, mark);
+    expect(AuthForms.savePassword, isFalse);
+  });
 }

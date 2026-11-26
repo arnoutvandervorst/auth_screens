@@ -64,7 +64,7 @@ class ResetPasswordBody extends HookWidget {
         ),
         AuthScreens.button(
           context,
-          StatusAction(key: sendKey, label: l.reset, busy: busy.value, onPressed: ready && !busy.value ? send : null),
+          StatusAction(key: sendKey, label: l.reset, icon: AuthForms.icons.reset, busy: busy.value, onPressed: ready && !busy.value ? send : null),
         ),
         AuthScreens.button(context, StatusAction(label: l.backToSignIn, emphasis: StatusEmphasis.quiet, onPressed: onBack)),
       ]);

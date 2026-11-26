@@ -47,7 +47,7 @@ class EmailAuthBody extends StatelessWidget {
           ? flows.createUserWithEmailAndPassword(email: email, password: password)
           : flows.signInWithEmailAndPassword(email: email, password: password),
     );
-    if (ok) TextInput.finishAutofillContext(shouldSave: true);
+    if (ok) TextInput.finishAutofillContext(shouldSave: AuthForms.savePassword);
   }
 
   @override
@@ -92,6 +92,7 @@ class EmailAuthBody extends StatelessWidget {
                 StatusAction(
                   key: submitKey,
                   label: signUp ? l.signUp : l.signIn,
+                  icon: signUp ? AuthForms.icons.signUp : AuthForms.icons.signIn,
                   busy: busy,
                   onPressed: ready && !busy ? _submit : null,
                 ),
