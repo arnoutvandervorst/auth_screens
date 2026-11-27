@@ -2,6 +2,13 @@
 
 All notable changes to this package. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses [semantic versioning](https://semver.org/) (pre-1.0: a minor bump may break the API). Each version is a git tag (`vX.Y.Z`) with a GitHub release.
 
+## [0.7.0] - 2026-11-27
+### Changed
+- Depends on auth_engine 0.4.0 (a failed step after sign-in never deletes a returning account; phone verification ends on every path). An app must be on auth_engine 0.4.0 to use this version without a git-ref conflict.
+### Fixed
+- `EmailNotVerifiedStatus`: a resend or a check that throws no longer leaves its button busy. A resend that throws shows `resendFailed`; a check that throws still reaches the caller.
+- The e-mail fields of `EmailAuthBody` and `ResetPasswordBody` show the address the credentials state already holds.
+
 ## [0.6.0] - 2026-11-26
 ### Added
 - `PhoneSignInBody` says an empty number or an empty code in its own words (`AuthFormsStrings.phoneMissing`, `codeMissing`) and does not ask the state: it used to show the wording of an invalid credential. The next keystroke takes the line away.

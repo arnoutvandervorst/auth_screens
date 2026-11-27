@@ -149,7 +149,11 @@ class EmailNotVerifiedStatus extends HookWidget {
           busy: sending.value,
           onPressed: () async {
             sending.value = true;
-            final sent = await onResend();
+            //* A resend that throws is a failed one: the button never stays busy.
+            var sent = false;
+            try {
+              sent = await onResend();
+            } catch (_) {}
             if (!context.mounted) return;
             sending.value = false;
             result.value = sent ? null : resendFailed;
@@ -163,10 +167,13 @@ class EmailNotVerifiedStatus extends HookWidget {
           onPressed: () async {
             checking.value = true;
             result.value = null;
-            final line = await onCheck();
-            if (!context.mounted) return;
-            result.value = line;
-            checking.value = false;
+            try {
+              final line = await onCheck();
+              if (context.mounted) result.value = line;
+            } finally {
+              //* Also when the check throws: the button never stays busy.
+              if (context.mounted) checking.value = false;
+            }
           },
         ),
         StatusAction(label: l.signInOther, emphasis: StatusEmphasis.quiet, onPressed: onSignOut),

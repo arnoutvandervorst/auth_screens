@@ -61,6 +61,8 @@ class ResetPasswordBody extends HookWidget {
           key: const ValueKey('auth-email'),
           kind: AuthFieldKind.email,
           hint: l.email,
+          //* What the state already holds (typed on the sign-in page) shows in the field.
+          initialValue: credentials.username.peek(),
           onChanged: credentials.setUserName,
           onSubmitted: (_) => send(),
         ),

@@ -85,6 +85,8 @@ class EmailAuthBody extends HookWidget {
                 key: const ValueKey('auth-email'),
                 kind: AuthFieldKind.email,
                 hint: l.email,
+                //* What the state already holds (typed on another page) shows in the field.
+                initialValue: credentials.username.peek(),
                 onChanged: (value) {
                   missing.value = null;
                   credentials.setUserName(value);
